@@ -1,8 +1,6 @@
 import os
 import subprocess
 
-
-
 # --- 2. CONFIGURATION ---
 # Path to the dataset prepared by prepare_dataset.py
 DATA_DIR = "./training_data"
