@@ -3,7 +3,7 @@ from PIL import Image
 from tqdm import tqdm
 import shutil
 
-INPUT_DIR = "/content/drive/MyDrive/Datasets/Celebrity faces"
+INPUT_DIR = "/Users/mdsaibhossain/code/python/GAN/Celebrity faces"
 
 # Output: Where the clean, captioned training data will go
 OUTPUT_DIR = "./training_data"
