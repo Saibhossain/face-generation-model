@@ -1,0 +1,12 @@
+pillow~=12.0.0
+tqdm~=4.67.1
+diffusers==0.36.0
+transformers==4.57.3
+accelerate==1.12.0
+peft==
+bitsandbytes
+ftfy
+tensorboard
+datasets==4.4.1
+scipy
+xformers
