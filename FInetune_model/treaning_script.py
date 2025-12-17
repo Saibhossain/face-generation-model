@@ -1,5 +1,15 @@
 import os
 import subprocess
+import urllib.request
+import torch
+
+# Prefer MPS on macOS if available
+if torch.backends.mps.is_available():
+    torch.set_default_device("mps")
+elif torch.cuda.is_available():
+    torch.set_default_device("cuda")
+else:
+    torch.set_default_device("cpu")
 
 # --- 2. CONFIGURATION ---
 # Path to the dataset prepared by prepare_dataset.py
@@ -11,8 +21,10 @@ MODEL_NAME = "stabilityai/stable-diffusion-xl-base-1.0"
 # We use the official script from Hugging Face Diffusers examples
 if not os.path.exists("train_text_to_image_lora_sdxl.py"):
     print("Downloading official training script...")
-    subprocess.run(["wget", "https://raw.githubusercontent.com/huggingface/diffusers/main/examples/text_to_image/train_text_to_image_lora_sdxl.py"])
-
+    subprocess.run([
+        "curl", "-o", "train_text_to_image_lora_sdxl.py",
+        "https://raw.githubusercontent.com/huggingface/diffusers/main/examples/text_to_image/train_text_to_image_lora_sdxl.py"
+    ])
 # --- 4. LAUNCH TRAINING ---
 print(" Starting Training... check logs below.")
 
@@ -23,18 +35,18 @@ cmd = [
     f"--train_data_dir={DATA_DIR}",
     f"--output_dir={OUTPUT_DIR}",
     "--caption_column=text",
-    "--resolution=1024",
+    "--resolution=51 2",          # ⬅️ Reduced!
     "--random_flip",
-    "--train_batch_size=1",           # Batch 1 is safer for VRAM on Colab
-    "--num_train_epochs=10",          # 500 images * 10 epochs = 5000 steps roughly
-    "--checkpointing_steps=500",
+    "--train_batch_size=1",
+    "--num_train_epochs=1",       # ⬅️ Test with 1 epoch first!
+    "--checkpointing_steps=100",  # ⬅️ More frequent saves (optional)
     "--learning_rate=1e-4",
     "--lr_scheduler=constant",
     "--lr_warmup_steps=0",
-    "--mixed_precision=fp16",
-    "--gradient_checkpointing",       # Critical for VRAM saving
-    "--use_8bit_adam",                # Critical for VRAM saving
-    "--seed=42"
+    "--gradient_checkpointing",
+    "--seed=42",
+    "--dataloader_num_workers=0", # ⬅️ macOS doesn’t handle workers well
+    "--validation_prompt=",       # ⬅️ Disable validation
 ]
 
 # Run the command
